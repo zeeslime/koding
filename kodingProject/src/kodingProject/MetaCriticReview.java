@@ -1,3 +1,4 @@
+package kodingProject;
 
 public class MetaCriticReview {
 	
