@@ -46,7 +46,7 @@ public class MetaCritic extends Game {
 		this.negativeReview = negativeReview;
 	}
 
-	public List<MetaCriticReview> getListOfReviews() {
+	public ArrayList<MetaCriticReview> getListOfReviews() {
 		return listOfReviews;
 	}
 
