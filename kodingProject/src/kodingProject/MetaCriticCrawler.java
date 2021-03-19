@@ -1,17 +1,15 @@
 package kodingProject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 
 public class MetaCriticCrawler {
 
@@ -22,63 +20,56 @@ public class MetaCriticCrawler {
 	}
 
 	// get a list of search results base on game title
-	public Elements searchGame(String gameTitle) throws IOException {
-		String metaCriticUrl = "https://www.metacritic.com/search/game/" + gameTitle
-				+ "/results?plats[3]=1&search_type=advanced";
-		Document document = Jsoup.connect(metaCriticUrl).get();
-		if (document.getElementsByClass("search_results module").isEmpty()) {
-			System.out.println("Not found in metacritic");
-			return null;
-		} else {
-			Elements searchResult = document.getElementsByClass("search_results module").first()
-					.getElementsByClass("product_title basic_stat");
-			return searchResult;
-		}
-	}
+	public ArrayList<String> getGameInfo(ArrayList<SteamGames> listOfSteam) throws IOException {
+		ArrayList<String> listOfUrl = new ArrayList<String>();
 
-	// search for the exact game base on the game title by comparing release date
-	// and the developer
-	// return the URL for the specific game
-	public String getMetaGame(Elements searchResult, String steamDeveloper, String steamDate) throws IOException {
+		for (SteamGames s : listOfSteam) {
+			String searchMetaCriticUrl = "https://www.metacritic.com/search/game/" + s.getGameTitle() + "/results?plats[3]=1&search_type=advanced";
+			Document document = Jsoup.connect(searchMetaCriticUrl).get();
+			if (document.getElementsByClass("search_results module").isEmpty()) {
+				System.out.println("Not found in metacritic");
+				listOfUrl.add("");
+			} else {
+				Elements searchResult = document.getElementsByClass("search_results module").first().getElementsByClass("product_title basic_stat");
+				boolean gameFound = false;
+				for (Element a : searchResult) {
+					String userReviewUrl = "";
+					String developerStudio = "";
+					String releaseDate = "";
 
-		String userReviewUrl = null;
-		String developerStudio = null;
-		String releaseDate = null;
-		for (Element a : searchResult) {
-			String specificMetaCriticGameUrl = metaCriticUrl + a.child(0).attr("href");
-			Document newDoc = Jsoup.connect(specificMetaCriticGameUrl).get();
+					String specificMetaCriticGameUrl = metaCriticUrl + a.child(0).attr("href");
+					System.out.println(specificMetaCriticGameUrl);
+					Document newDoc = Jsoup.connect(specificMetaCriticGameUrl).get();
 
-			Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer");
-			developerStudio = findDeveloper.first().child(1).child(0).text();
+					Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer");
+					developerStudio = findDeveloper.first().child(1).child(0).text();
 
-			Elements findDate = newDoc.getElementsByClass("summary_detail release_data");
-			releaseDate = findDate.first().child(1).text();
+					Elements findDate = newDoc.getElementsByClass("summary_detail release_data");
+					releaseDate = findDate.first().child(1).text();
 
-			// if developer and release date match set the link
-			if ((steamDeveloper.contains(developerStudio)) && (releaseDate.equals(steamDate))) {
-				Elements userReviewLink = newDoc.getElementsByClass("userscore_wrap feature_userscore");
-				userReviewUrl = metaCriticUrl + userReviewLink.first().child(1).attr("href"); // set the new URL
-				System.out.println(userReviewUrl);
-				break;
+//					 if developer and release date match set the link
+					if ((s.getDeveloper().contains(developerStudio)) && (releaseDate.equals(s.getReleaseDate()))) {
+						Elements userReviewLink = newDoc.getElementsByClass("userscore_wrap feature_userscore");
+						userReviewUrl = metaCriticUrl + userReviewLink.first().child(1).attr("href"); // set the new URL
+						listOfUrl.add(userReviewUrl);
+						gameFound = true;
+						// System.out.println(userReviewUrl);
+						break;
+					}
+				}
+				if (gameFound == false) {
+					listOfUrl.add("");
+				}
 			}
 		}
-		return userReviewUrl; // return null if no specific game found
+		return listOfUrl;
 	}
 
-	public void getReview(String url, String gameTitle, DB db) throws IOException {
-		DBCollection reviewCollection;
-		DBCollection metaStatsCollection;
-		if (db.collectionExists("meta review")) {
-			reviewCollection = db.getCollection("meta review");
-		} else {
-			reviewCollection = db.createCollection("meta review", null);
-		}
+	public void getReview(String url, String gameTitle, MongoDatabase db) throws IOException {
+		MongoCollection<org.bson.Document> reviewCollection = db.getCollection("meta review");
 
-		if (db.collectionExists("meta stats")) {
-			metaStatsCollection = db.getCollection("meta stats");
-		} else {
-			metaStatsCollection = db.createCollection("meta stats", null);
-		}
+		MongoCollection<org.bson.Document> metaStatsCollection = db.getCollection("meta stats");
+
 		Document userReviewDoc = Jsoup.connect(url).get();
 
 		// get user overall score
@@ -104,7 +95,7 @@ public class MetaCriticCrawler {
 				String reviewBody = null;
 				String reviewScore = null;
 				String reviewDate = null;
-				BasicDBObject metaReview = new BasicDBObject();
+				org.bson.Document metaReview = new org.bson.Document();
 				// if there is a expand on the review, get the expanded child
 				if (e.child(0).child(0).child(0).child(0).child(0).child(0).child(1).child(0).childrenSize() == 4) {
 					reviewBody = e.child(0).child(0).child(0).child(0).child(0).child(0).child(1).child(0).child(1)
@@ -119,12 +110,12 @@ public class MetaCriticCrawler {
 				reviewDate = e.child(0).child(0).child(0).child(0).child(0).child(0).child(0).child(0).child(1).text();
 
 				if (reviewBody != "") {
-					metaReview.put("gametitle", gameTitle);
-					metaReview.put("userreview", reviewBody);
-					metaReview.put("userscorescore", reviewScore);
-					metaReview.put("reviewdate", reviewDate);
-					metaReview.put("reviewcategory", "firstload");
-					reviewCollection.insert(WriteConcern.SAFE, metaReview);
+					metaReview.append("gametitle", gameTitle);
+					metaReview.append("userreview", reviewBody);
+					metaReview.append("userscorescore", reviewScore);
+					metaReview.append("reviewdate", reviewDate);
+					metaReview.append("reviewcategory", "firstload");
+					reviewCollection.insertOne(metaReview);
 				} else {
 					continue;
 				}
@@ -173,25 +164,24 @@ public class MetaCriticCrawler {
 				getCategoryReview(negativeUrl, "negative", gameTitle, reviewCollection);
 			}
 
-			BasicDBObject metaStats = new BasicDBObject();
-			metaStats.put("gameTitle", gameTitle);
-			metaStats.put("scoreresult", scoreResult);
-			metaStats.put("positive", positiveNumber);
-			metaStats.put("neutral", neutralNumber);
-			metaStats.put("negative", negativeNumber);
-			metaStatsCollection.insert(WriteConcern.SAFE, metaStats);
+			org.bson.Document metaStats = new org.bson.Document();
+			metaStats.append("gametitle", gameTitle);
+			metaStats.append("scoreresult", scoreResult);
+			metaStats.append("positive", positiveNumber);
+			metaStats.append("neutral", neutralNumber);
+			metaStats.append("negative", negativeNumber);
+			metaStatsCollection.insertOne(metaStats);
 
 		} else { // if score result equal to "tbd"
-			BasicDBObject metaStats = new BasicDBObject();
-			metaStats.put("gameTitle", gameTitle);
-			metaStats.put("scoreResult", "tbd");
-			metaStatsCollection.insert(WriteConcern.SAFE, metaStats);
+			org.bson.Document metaStats = new org.bson.Document();
+			metaStats.append("gametitle", gameTitle);
+			metaStats.append("scoreResult", "tbd");
+			metaStatsCollection.insertOne(metaStats);
 		}
 	}
 
 	// return List<MetaCriticReview>
-	public void getCategoryReview(String url, String reviewCategory, String gameTitle, DBCollection collection)
-			throws IOException {
+	public void getCategoryReview(String url, String reviewCategory, String gameTitle, MongoCollection<org.bson.Document> collection) throws IOException {
 
 		Document userReviewDoc = Jsoup.connect(url).get();
 
@@ -202,7 +192,7 @@ public class MetaCriticCrawler {
 			String reviewBody = null;
 			String reviewScore = null;
 			String reviewDate = null;
-			BasicDBObject metaReview = new BasicDBObject();
+			org.bson.Document metaReview = new org.bson.Document();
 			// if there is a expand on the review, get the expanded child
 			if (e.child(0).child(0).child(0).child(0).child(0).child(0).child(1).child(0).childrenSize() == 4) {
 				reviewBody = e.child(0).child(0).child(0).child(0).child(0).child(0).child(1).child(0).child(1).text();
@@ -216,12 +206,12 @@ public class MetaCriticCrawler {
 			reviewDate = e.child(0).child(0).child(0).child(0).child(0).child(0).child(0).child(0).child(1).text();
 
 			if (reviewBody != "") {
-				metaReview.put("gametitle", gameTitle);
-				metaReview.put("userreview", reviewBody);
-				metaReview.put("userscorescore", reviewScore);
-				metaReview.put("reviewdate", reviewDate);
-				metaReview.put("reviewcategory", reviewCategory);
-				collection.insert(WriteConcern.SAFE, metaReview);
+				metaReview.append("gametitle", gameTitle);
+				metaReview.append("userreview", reviewBody);
+				metaReview.append("userscorescore", reviewScore);
+				metaReview.append("reviewdate", reviewDate);
+				metaReview.append("reviewcategory", reviewCategory);
+				collection.insertOne(metaReview);
 			} else {
 				continue;
 			}

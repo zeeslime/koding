@@ -2,11 +2,11 @@ package kodingProject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaCritic {
+public class MetaCritic extends Game {
 	
 	private double userGameScore;
 	private int positiveReview;
-	private int mixedReview;
+	private int neutralReview;
 	private int negativeReview;
 	private ArrayList<MetaCriticReview> listOfReviews;
 
@@ -30,12 +30,12 @@ public class MetaCritic {
 		this.positiveReview = positiveReview;
 	}
 
-	public int getMixedReview() {
-		return mixedReview;
+	public int getNeutralReview() {
+		return neutralReview;
 	}
 
-	public void setMixedReview(int mixedReview) {
-		this.mixedReview = mixedReview;
+	public void setNeutralReview(int neutralReview) {
+		this.neutralReview = neutralReview;
 	}
 
 	public int getNegativeReview() {

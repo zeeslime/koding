@@ -5,7 +5,7 @@ public class MetaCriticReview {
 	private int reviewScore;
 	private String reviewText;
 	private String reviewCategory;
-	private String reviewDate; //helpful or latest
+	private String reviewDate; 
 	
 	
 	public MetaCriticReview()
