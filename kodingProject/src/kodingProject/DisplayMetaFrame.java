@@ -1,4 +1,6 @@
+
 package kodingProject;
+
 
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -143,3 +145,4 @@ public class DisplayMetaFrame {
 		textPane.setCaretPosition(i);
 	}
 }
+

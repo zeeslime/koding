@@ -83,6 +83,4 @@ public class SteamGames extends Game{
 		this.listOfSteamReviews = listOfSteamReviews;
 	}
 
-	
-
 }
