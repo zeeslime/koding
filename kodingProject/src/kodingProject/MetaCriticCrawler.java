@@ -128,7 +128,7 @@ public class MetaCriticCrawler {
 						metaReview.append("userreview", reviewBody);
 						metaReview.append("userscorescore", reviewScore);
 						metaReview.append("reviewdate", reviewDate);
-						metaReview.append("reviewcategory", "firstload");
+						metaReview.append("reviewcategory", "most helpful");
 						reviewCollection.insertOne(metaReview);
 						counter++;
 					} else {
