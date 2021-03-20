@@ -79,8 +79,8 @@ public class MetaCriticReview {
 	}
 	/**
 	 * Set Review Date in string format
-	 * @param reviewDate is the review date in years [1,100]
-	 * @exception IllegalArgumentException if the date is zero, negative, or more than 100
+	 * @param reviewDate is the Game Reviews Date in String
+	 * @exception IllegalArgumentException if the Game Reviews Date is empty
 	 */
 	public void setReviewDate(String reviewDate) {
 		if(reviewDate == null || reviewDate.isEmpty()) 
