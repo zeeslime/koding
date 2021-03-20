@@ -43,6 +43,7 @@ public class MetaCriticCrawler {
 					if (gameTitle.equals(s.getGameTitle())) { //if game title equals to steam game title then add to the list
 						listOfUrl.add(specificMetaCriticGameUrl + "/user-reviews");
 						gameFound = true;
+						break;
 					} else { //else if game title not equal to steam game title, access the page to check for more info (accuracy of correct games)
 						Document newDoc = loadDocument(specificMetaCriticGameUrl);
 
@@ -77,7 +78,7 @@ public class MetaCriticCrawler {
 		if (url.isEmpty()) { 
 			org.bson.Document metaStats = new org.bson.Document();
 			metaStats.append("gametitle", gameTitle);
-			metaStats.append("scoreResult", "tbd");
+			metaStats.append("scoreresult", "tbd");
 			metaStatsCollection.insertOne(metaStats);
 		} else { //else if url is not empty
 			
@@ -190,7 +191,7 @@ public class MetaCriticCrawler {
 			} else { // if score result equal to "tbd"
 				org.bson.Document metaStats = new org.bson.Document();
 				metaStats.append("gametitle", gameTitle);
-				metaStats.append("scoreResult", "tbd");
+				metaStats.append("scoreresult", "tbd");
 				metaStatsCollection.insertOne(metaStats);
 			}
 		}
