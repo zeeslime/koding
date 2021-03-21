@@ -1,39 +1,17 @@
-package kodingProject;
-
-import org.jsoup.Connection;
-import org.jsoup.Connection.Method;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.Validate;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
 import com.mongodb.MongoClient;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Scanner;
 
-import javax.imageio.ImageIO;
 import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -41,27 +19,13 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 
-import java.awt.GridBagLayout;
-import javax.swing.JMenuBar;
-import java.awt.FlowLayout;
 import javax.swing.JSplitPane;
-import javax.swing.JTextField;
 import javax.swing.JTextPane;
-import javax.swing.border.BevelBorder;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-
-/**
- * This is a CrawlerProgram Class for Main
- * @author Zhan An, Wei Xiang, Jing Wei, Chang Hua
- */
 
 public class CrawlerProgram {
 	static ArrayList<MetaCritic> mc = new ArrayList<>();
