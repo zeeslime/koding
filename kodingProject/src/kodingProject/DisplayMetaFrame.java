@@ -1,7 +1,3 @@
-
-package kodingProject;
-
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -10,8 +6,8 @@ import java.util.ArrayList;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -19,7 +15,7 @@ import javax.swing.JTextPane;
 
 public class DisplayMetaFrame {
 
-	JFrame f = new JFrame("MetaCritic Reviews");
+	JPanel panel = new JPanel();
 	JRadioButton helpful = new JRadioButton("Most Helpful");
 	JRadioButton positive = new JRadioButton("Positive");
 	JRadioButton neutral = new JRadioButton("Neutral");
@@ -34,9 +30,8 @@ public class DisplayMetaFrame {
 
 	public DisplayMetaFrame(MetaCritic mc) {
 		this.mc = mc;
-		f.setSize(700, 600);
-		f.setResizable(false);
-		f.setLayout(new FlowLayout());
+	
+		panel.setLayout(new FlowLayout());
 
 		ButtonGroup group = new ButtonGroup();
 		group.add(helpful);
@@ -45,7 +40,7 @@ public class DisplayMetaFrame {
 		group.add(negative);
 
 		textfield.setPreferredSize(new Dimension(100, 20));
-
+		
 		textPane.setText("Please select option or search");
 		textPane.setEditable(false);
 		textPane.setPreferredSize(new Dimension(600, 500));
@@ -89,18 +84,18 @@ public class DisplayMetaFrame {
 				searchReview();
 			}
 		});
-		f.add(label);
-		f.add(textfield);
-		f.add(searchButton);
-		f.add(helpful);
-		f.add(positive);
-		f.add(neutral);
-		f.add(negative);
-		f.add(scrollPane);
-		f.setVisible(true);
-		f.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		panel.add(label);
+		panel.add(textfield);
+		panel.add(searchButton);
+		panel.add(helpful);
+		panel.add(positive);
+		panel.add(neutral);
+		panel.add(negative);
+		panel.add(scrollPane);
+		panel.setVisible(true);
 	}
-
+	
+	// Sorts the Metacritic reviews based on Categories
 	public void sortReview(String category, int categorySize) {
 		String reviewTitle = "Showing " + category + " review\n\n";
 		String reviewBody = "";
@@ -121,7 +116,8 @@ public class DisplayMetaFrame {
 		textPane.setText(reviewTitle + reviewBody);
 		textPane.setCaretPosition(0);
 	}
-
+	
+	// Search for reviews based on keywords
 	public void searchReview() {
 		String keyword = textfield.getText();
 		String reviewBody = "";
@@ -144,5 +140,8 @@ public class DisplayMetaFrame {
 		}
 		textPane.setCaretPosition(i);
 	}
+	
+	public JPanel getPanel() {
+		return panel;
+	}
 }
-
