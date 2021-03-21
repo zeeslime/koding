@@ -1,5 +1,3 @@
-package kodingProject;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -25,13 +23,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextPane;
 import javax.swing.border.BevelBorder;
-
-/**
- * This is the ListPanel class for UI Listings
- * 
- * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
- */
 
 public class ListPanel extends JPanel
 {
@@ -125,7 +118,8 @@ public class ListPanel extends JPanel
 		JLabel sumReviewLabel = new JLabel();
 		JLabel priceLabel = new JLabel();
 		SteamGames game = new SteamGames();
-
+		SteamGameReviews gameReview = new SteamGameReviews();
+		
 		game = sg.get(i);
 		URL url = new URL(game.getImg());
 		BufferedImage image = ImageIO.read(url);
@@ -152,4 +146,48 @@ public class ListPanel extends JPanel
 		panel.setAlignmentX(Component.CENTER_ALIGNMENT);
 		return panel;
 	}
+    
+    public static JPanel getReviewJPanel(ArrayList<SteamGames> sg, int i) throws IOException {
+        JPanel panel = new JPanel();
+        JLabel gameLabel = new JLabel();
+        JLabel descLabel = new JLabel();
+        JLabel sumReviewLabel = new JLabel();
+        JLabel priceLabel = new JLabel();
+        JTextPane textPane = new JTextPane();
+        SteamGames game = new SteamGames();
+        String reviewTitle = "Steam reviews:\n\n";
+        String reviewBody = "";
+        JScrollPane sp = new JScrollPane(textPane);
+
+        game = sg.get(i);
+        ArrayList<SteamGameReviews> reviewList = game.getListOfSteamReviews();
+        URL url = new URL(game.getImg());
+        BufferedImage image = ImageIO.read(url);
+
+        int j = 0;
+        for (SteamGameReviews sr : reviewList) {
+                reviewBody = reviewBody + "Steam Review #" + (j + 1) + "    Found Helpful: "
+                        + sr.getFoundHelpful() + "\n" + sr.getReview() + "\n\n";
+                j++;
+        }
+        textPane.setText(reviewTitle + reviewBody);
+
+        gameLabel.setText(game.getGameTitle());
+        descLabel.setText(game.getDesc());
+        sumReviewLabel.setText(game.getSumReview());
+        priceLabel.setText(game.getPrice());
+
+        panel.add(new JLabel(new ImageIcon(image)));
+        panel.add(gameLabel);
+        panel.add(descLabel);
+        panel.add(sumReviewLabel);
+        panel.add(priceLabel);
+        panel.add(sp);
+
+        panel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        return panel;
+    }
 }

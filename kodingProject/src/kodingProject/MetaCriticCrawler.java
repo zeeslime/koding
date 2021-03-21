@@ -1,5 +1,3 @@
-package kodingProject;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -13,29 +11,17 @@ import org.jsoup.select.Elements;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-/**
- * This is a MetaCriticCrawler Class for crawling "Game Information", "Game Review", "Review Category" & "Loading Document"
- * @author Wei Xiang, Zhan An, Jing Wei, Chang Hua
- */
-
 public class MetaCriticCrawler {
 
 	final String metaCriticUrl = "https://www.metacritic.com"; //base URL of metacritic
-	
-	/**
-	 * This is a default constructor
-	 */
+
 	public MetaCriticCrawler() {
 
 	}
-	
+
 	//This method search each game title on MetaCritic supplied by the ArrayList<SteamGames>
 	//and return an ArrayList<String> of user reviews URL
-	/**
-	 * Get the Game Information
-	 * @return the array list of Steam Games User Review URL in string format if found
-	 */
-	public ArrayList<String> getGameInfo(ArrayList<SteamGames> listOfSteam) throws IOException {
+	public ArrayList<String> getLinks(ArrayList<SteamGames> listOfSteam) throws IOException {
 		ArrayList<String> listOfUrl = new ArrayList<String>(); //to store the url
 		
 		//loop base on the number of steam games
@@ -44,7 +30,7 @@ public class MetaCriticCrawler {
 			String searchMetaCriticUrl = "https://www.metacritic.com/search/game/" + s.getGameTitle() + "/results?plats[3]=1&search_type=advanced";
 			Document document = loadDocument(searchMetaCriticUrl); //Load the url
 			if (document.getElementsByClass("search_results module").isEmpty()) { //if search result is empty add "" into the list
-				System.out.println("Not found in metacritic");
+				System.out.println("Crawling not found in metacritic: " + s.getGameTitle());
 				listOfUrl.add("");
 			} else { //else if search result is not empty
 				Elements searchResult = document.getElementsByClass("search_results module").first().getElementsByClass("product_title basic_stat");
@@ -60,10 +46,10 @@ public class MetaCriticCrawler {
 						break;
 					} else { //else if game title not equal to steam game title, access the page to check for more info (accuracy of correct games)
 						Document newDoc = loadDocument(specificMetaCriticGameUrl);
-
-						Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer"); //get the developer studio
-						developerStudio = findDeveloper.first().child(1).child(0).text();
-
+						if (newDoc.getElementsByClass("summary_detail developer").first() != null) {
+							Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer"); //get the developer studio
+							developerStudio = findDeveloper.first().child(1).child(0).text();
+						}
 						//if developer studio contains steam developer studio and vice versa, add URL to the list
 						if ((s.getDeveloperStudio().contains(developerStudio)) || (developerStudio.contains(s.getDeveloperStudio()))) {
 							listOfUrl.add(specificMetaCriticGameUrl + "/user-reviews");
@@ -74,6 +60,7 @@ public class MetaCriticCrawler {
 				}
 				//if game is not found add "" to the list
 				if (gameFound == false) {
+					System.out.println("Crawling not found in metacritic: " + s.getGameTitle());
 					listOfUrl.add("");
 				}
 			}
@@ -81,10 +68,8 @@ public class MetaCriticCrawler {
 		return listOfUrl; //return the list of user reviews URL
 	}
 
-	/**
-	 * Get the User's review on the game and inserting it into database
-	 */
-	public void getReview(String url, String gameTitle, MongoDatabase db) throws IOException {
+	//this method will be use to retrieve user reviews and inserting it into database
+	public void getGameInfo(String url, String gameTitle, MongoDatabase db) throws IOException {
 		
 		//creating database table, auto create if it doesn't exist
 		MongoCollection<org.bson.Document> reviewCollection = db.getCollection("meta review");
@@ -171,7 +156,7 @@ public class MetaCriticCrawler {
 					positiveUrl = metaCriticUrl + categoryNumber.first().child(0).child(1).child(0).attr("href");
 					getCategoryReview(positiveUrl, "positive", gameTitle, reviewCollection);
 				}
-				//end of getting positive review number
+				//end of getting postive review number
 				
 				// get neutral reviews number
 				// if review number is 0,unable to retrieve href attribute therefore get the text that is "0"
@@ -212,10 +197,7 @@ public class MetaCriticCrawler {
 			}
 		}
 	}
-	
-	/**
-	 * Get the Category of each Review, stop once 10 reviews has been crawled
-	 */
+
 	public void getCategoryReview(String url, String reviewCategory, String gameTitle,MongoCollection<org.bson.Document> collection) throws IOException {
 		Document userReviewDoc = loadDocument(url); //load the document 
 		
@@ -256,10 +238,7 @@ public class MetaCriticCrawler {
 		}
 	}
 	
-	/**
-	 * Loads the document
-	 * @return load of the document, if exception caught retry and fetch again
-	 */ 
+	//this method is to load document, if exception caught retry and fetch again
 	public Document loadDocument(String url) throws IOException {
 		Document load;
 		//if url caught by an exception, connect and get the url again
@@ -280,4 +259,6 @@ public class MetaCriticCrawler {
 		} while (true);
 		return load;
 	}
+
+	
 }

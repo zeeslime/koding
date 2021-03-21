@@ -1,5 +1,3 @@
-package kodingProject;
-
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -15,11 +13,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
-/**
- * This is the DisplayMetaFrame class for UI Display 
- * 
- * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
- */
 public class DisplayMetaFrame {
 
 	JPanel panel = new JPanel();
@@ -33,7 +26,7 @@ public class DisplayMetaFrame {
 	JTextPane textPane = new JTextPane();
 	JScrollPane scrollPane = new JScrollPane(textPane);
 	MetaCritic mc = new MetaCritic();
-	String category = "";
+	String category = ""; //keep track of what is being selected
 
 	public DisplayMetaFrame(MetaCritic mc) {
 		this.mc = mc;
@@ -48,10 +41,8 @@ public class DisplayMetaFrame {
 
 		textfield.setPreferredSize(new Dimension(100, 20));
 		
-		textPane.setText("Please select option or search");
 		textPane.setEditable(false);
 		textPane.setPreferredSize(new Dimension(600, 500));
-		// JScrollPane scrollPane = new JScrollPane(textPane);
 		scrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 
 		helpful.setSelected(true);
@@ -131,7 +122,7 @@ public class DisplayMetaFrame {
 		String reviewTitle = "Showing results for all reviews related to " + keyword + "\n\n";
 		int i = 0;
 
-		if (keyword.trim().isBlank()) {
+		if ((keyword.trim().isBlank()) && (keyword.trim().isEmpty())) { //check if textfield is empty
 			textPane.setText("Please enter keyword that is not empty");
 		} else {
 			ArrayList<MetaCriticReview> reviewList = mc.getListOfReviews();
@@ -148,6 +139,7 @@ public class DisplayMetaFrame {
 		textPane.setCaretPosition(i);
 	}
 	
+	//return panel to display on the card layout
 	public JPanel getPanel() {
 		return panel;
 	}
