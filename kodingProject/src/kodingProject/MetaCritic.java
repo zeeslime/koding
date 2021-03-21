@@ -1,5 +1,6 @@
 package kodingProject;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class MetaCritic {
 	 * @exception IllegalArgumentException if the User's Game Score if negative 
 	 */
 	public void setUserGameScore(double userGameScore) {
-		if(userGameScore<=0 || userGameScore> 10)
+		if(userGameScore<0 || userGameScore> 10)
 			throw new IllegalArgumentException("Invalid Score");
 		this.userGameScore = userGameScore;
 	}
@@ -51,7 +52,7 @@ public class MetaCritic {
 	 * @exception IllegalArgumentException if the number of Positive Reviews if negative 
 	 */
 	public void setPositiveReview(int positiveReview) {
-		if(positiveReview<=0)
+		if(positiveReview<0)
 			throw new IllegalArgumentException("Illegal Count");
 		this.positiveReview = positiveReview;
 	}
@@ -68,7 +69,7 @@ public class MetaCritic {
 	 * @exception IllegalArgumentException if the number of Neutral Reviews if negative 
 	 */
 	public void setNeutralReview(int neutralReview) {
-		if(neutralReview<=0)
+		if(neutralReview<0)
 			throw new IllegalArgumentException("Illegal Count");
 		this.neutralReview = neutralReview;
 	}
@@ -85,7 +86,7 @@ public class MetaCritic {
 	 * @exception IllegalArgumentException if the number of Negative Reviews if negative 
 	 */
 	public void setNegativeReview(int negativeReview) {
-		if(negativeReview<=0)
+		if(negativeReview<0)
 			throw new IllegalArgumentException("Illegal Count");
 		this.negativeReview = negativeReview;
 	}
