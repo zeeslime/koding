@@ -93,7 +93,6 @@ public class RetrieveData {
 				//if overall score is "tbd" mean either game not found or no reviews set all to 0
 				String overallScoreString = doc.get("scoreresult").toString();
 				if (overallScoreString.equals("tbd")) {
-					mc.setListOfReviews(null);
 					mc.setUserGameScore(0);
 					mc.setPositiveReview(0);
 					mc.setNeutralReview(0);
