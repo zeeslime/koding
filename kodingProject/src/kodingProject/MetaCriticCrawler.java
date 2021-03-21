@@ -13,16 +13,28 @@ import org.jsoup.select.Elements;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+/**
+ * This is a MetaCriticCrawler Class for crawling "Game Information", "Game Review", "Review Category" & "Loading Document"
+ * @author Wei Xiang, Zhan An, Jing Wei, Chang Hua
+ */
+
 public class MetaCriticCrawler {
 
 	final String metaCriticUrl = "https://www.metacritic.com"; //base URL of metacritic
-
+	
+	/**
+	 * This is a default constructor
+	 */
 	public MetaCriticCrawler() {
 
 	}
-
+	
 	//This method search each game title on MetaCritic supplied by the ArrayList<SteamGames>
 	//and return an ArrayList<String> of user reviews URL
+	/**
+	 * Get the Game Information
+	 * @return the array list of Steam Games User Review URL in string format if found
+	 */
 	public ArrayList<String> getGameInfo(ArrayList<SteamGames> listOfSteam) throws IOException {
 		ArrayList<String> listOfUrl = new ArrayList<String>(); //to store the url
 		
@@ -69,7 +81,9 @@ public class MetaCriticCrawler {
 		return listOfUrl; //return the list of user reviews URL
 	}
 
-	//this method will be use to retrieve user reviews and inserting it into database
+	/**
+	 * Get the User's review on the game and inserting it into database
+	 */
 	public void getReview(String url, String gameTitle, MongoDatabase db) throws IOException {
 		
 		//creating database table, auto create if it doesn't exist
@@ -157,7 +171,7 @@ public class MetaCriticCrawler {
 					positiveUrl = metaCriticUrl + categoryNumber.first().child(0).child(1).child(0).attr("href");
 					getCategoryReview(positiveUrl, "positive", gameTitle, reviewCollection);
 				}
-				//end of getting postive review number
+				//end of getting positive review number
 				
 				// get neutral reviews number
 				// if review number is 0,unable to retrieve href attribute therefore get the text that is "0"
@@ -198,7 +212,10 @@ public class MetaCriticCrawler {
 			}
 		}
 	}
-
+	
+	/**
+	 * Get the Category of each Review, stop once 10 reviews has been crawled
+	 */
 	public void getCategoryReview(String url, String reviewCategory, String gameTitle,MongoCollection<org.bson.Document> collection) throws IOException {
 		Document userReviewDoc = loadDocument(url); //load the document 
 		
@@ -239,7 +256,10 @@ public class MetaCriticCrawler {
 		}
 	}
 	
-	//this method is to load document, if exception caught retry and fetch again
+	/**
+	 * Loads the document
+	 * @return load of the document, if exception caught retry and fetch again
+	 */ 
 	public Document loadDocument(String url) throws IOException {
 		Document load;
 		//if url caught by an exception, connect and get the url again
