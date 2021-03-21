@@ -31,7 +31,7 @@ public class MetaCriticReview {
 	 * @exception IllegalArgumentException if the game review score if negative or zero
 	 */
 	public void setReviewScore(int reviewScore) {	
-		if(reviewScore<=0 || reviewScore> 100)
+		if(reviewScore<0 || reviewScore> 100)
 			throw new IllegalArgumentException("Invalid Score");
 		this.reviewScore = reviewScore;
 	}

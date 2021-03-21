@@ -59,14 +59,15 @@ import java.awt.Container;
 import java.awt.Dimension;
 
 /**
- * This is the CrawlerProgram class for the main
- * 
- * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
+ * This is a CrawlerProgram Class for Main
+ * @author Zhan An, Wei Xiang, Jing Wei, Chang Hua
  */
+
 public class CrawlerProgram {
 	static ArrayList<MetaCritic> mc = new ArrayList<>();
 	static ArrayList<SteamGames> sg = new ArrayList<>();
 	static String selectGameTitle;
+	static int selectGameindex;
 
 	public static void main(String[] args) throws IOException {
 		// Creates a connection to database "GamesReview"
@@ -77,7 +78,7 @@ public class CrawlerProgram {
 
 		// Crawl a list of top selling game links from Steam
 		ArrayList<String> listOfGameLinks = SteamCrawler.getLinks();
-		// Retrive individual game information based on the links
+//		// Retrive individual game information based on the links
 		SteamCrawler.getGameInfo(listOfGameLinks, db);
 		sg = RetrieveData.retrieveSteam(db);
 
@@ -85,12 +86,15 @@ public class CrawlerProgram {
 		// MetaCritic
 		MetaCriticCrawler meta = new MetaCriticCrawler();
 		int counter = 0;
+		System.out.println("Start crawling for MetaCritic...");
 		ArrayList<String> url = meta.getLinks(sg);
 		for (SteamGames s : sg) {
+			System.out.println("\nRetrieving review on MetaCritic for: " + s.getGameTitle());
 			meta.getGameInfo(url.get(counter), s.getGameTitle(), db);
 			counter++;
-			System.out.println("MetaCritic Crawl Success#" + counter);
+			System.out.println("Completed retrieving review on MetaCritic for: " + s.getGameTitle());
 		}
+		System.out.println("Crawling from MetaCritic completed.");
 		mc = RetrieveData.retrieveMeta(db, sg); // store into ArrayList of metacritic
 
 		// Jframe components
@@ -137,6 +141,20 @@ public class CrawlerProgram {
 		gameScrollPanel.setColumnHeaderView(columnH);
 		gameScrollPanel.setViewportView(listPanel);
 
+		// Steam review panel for components
+		JPanel steamReviewCardPanel = new JPanel();
+		steamReviewCardPanel.setName("steamReviewCardPanel");
+		cardPanels.add(steamReviewCardPanel, "steamReviewCardPanel");
+		steamReviewCardPanel.setLayout(new CardLayout(0, 0));
+		
+		JScrollPane gameReviewScrollPanel = new JScrollPane();
+		gameReviewScrollPanel.setBackground(Color.PINK);
+		steamReviewCardPanel.add(gameReviewScrollPanel, "gameReviewScrollPanel");
+		gameReviewScrollPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+		JTextPane columnY = new JTextPane();
+		columnY.setText("Steam review:");
+		gameReviewScrollPanel.setColumnHeaderView(columnY);
+		
 		// Metacritic review panel for components
 		JPanel metaReviewCardPanel = new JPanel();
 		metaReviewCardPanel.setName("metaReviewCardPanel");
@@ -172,9 +190,10 @@ public class CrawlerProgram {
 		// Get selected game from MouseClick action to view selected game information
 		jList.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent evt) {
-				if (evt.getClickCount() == 2) {
+				if (evt.getClickCount() == 1) {
 					// cardLayout.show(cardPanels, "cardPanel5");
 					int index = jList.locationToIndex(evt.getPoint());
+					selectGameindex = index;
 					selectGameTitle = jList.getModel().getElementAt(index);
 
 					MetaCritic game = new MetaCritic();
@@ -184,9 +203,9 @@ public class CrawlerProgram {
 						}
 					}
 					gameLabel.setText("<html>" + game.getGameTitle() + "<br>" + "Overall Score: "
-							+ game.getUserGameScore() + "<br>" + "Positive reviews:" + game.getPositiveReview() + "<br>"
-							+ "Neutral reviews:" + game.getPositiveReview() + "<br>" + "Ngeative reviews:"
-							+ game.getPositiveReview() + "</html>");
+                            + game.getUserGameScore() + "<br>" + "Positive reviews:" + game.getPositiveReview() + "<br>"
+                            + "Neutral reviews:" + game.getNeutralReview() + "<br>" + "Ngeative reviews:"
+                            + game.getNegativeReview() + "</html>");
 				}
 			}
 		});
@@ -196,6 +215,7 @@ public class CrawlerProgram {
 		cardPanels.add(scrollPane, "gameSelectCardPanel");
 		cardLayout = (CardLayout) (cardPanels.getLayout());
 		cardLayout.show(cardPanels, "gameSelectCardPanel");
+		
 
 		// Displays game selection panel when button is clicked
 		gameListButton.addActionListener(new ActionListener() {
@@ -213,14 +233,41 @@ public class CrawlerProgram {
 		}
 
 		// Display Steam games panel when clicked
-		JButton steamButton = new JButton("Steam Review");
+		JButton steamButton = new JButton("Steam Games");
 		steamButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(cardPanels, "steamGamesCardPanel");
-				System.out.println(listPanel.getPanels().get(0));
-;			}
+			}
 		});
 		sideMenuBarPanel.add(steamButton);
+		
+		// Display Steam games review when clicked
+		JButton steamReviewButton = new JButton("Steam Review");
+		steamReviewButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				cardLayout.show(cardPanels, "steamReviewCardPanel");
+				steamReviewCardPanel.removeAll();
+				
+//				JScrollPane gameReviewScrollPanel = new JScrollPane();
+//				steamReviewCardPanel.add(gameReviewScrollPanel);
+				
+//				JPanel revPanel = new JPanel();
+				if (selectGameTitle == null) {
+					JOptionPane.showMessageDialog(null, "Please Select a game");
+				} else {
+					try {
+						steamReviewCardPanel.add(ListPanel.getReviewJPanel(sg, selectGameindex));
+//						revPanel.add(ListPanel.getReviewJPanel(sg, selectGameindex));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		sideMenuBarPanel.add(steamReviewButton);
+		
 
 		// Metacritic review button
 		JButton metaButton = new JButton("MetaCritic Review");
@@ -229,6 +276,7 @@ public class CrawlerProgram {
 			// Display list of metacritic reviews based on selected game title
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				metaPanel.removeAll();
 				cardLayout.show(cardPanels, "metaReviewCardPanel");
 				MetaCritic game = new MetaCritic();
 				for (MetaCritic m : mc) {
@@ -255,6 +303,8 @@ public class CrawlerProgram {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				cardLayout.show(cardPanels, "compareCardPanel");
+				comparePanel.removeAll();
+				
 				MetaCritic game = new MetaCritic();
 				SteamGames sgame = new SteamGames();
 				for (MetaCritic m : mc) {

@@ -35,7 +35,7 @@ public class MetaCriticCrawler {
 	 * Get the Game Information
 	 * @return the array list of Steam Games User Review URL in string format if found
 	 */
-	public ArrayList<String> getGameInfo(ArrayList<SteamGames> listOfSteam) throws IOException {
+	public ArrayList<String> getLinks(ArrayList<SteamGames> listOfSteam) throws IOException {
 		ArrayList<String> listOfUrl = new ArrayList<String>(); //to store the url
 		
 		//loop base on the number of steam games
@@ -44,7 +44,7 @@ public class MetaCriticCrawler {
 			String searchMetaCriticUrl = "https://www.metacritic.com/search/game/" + s.getGameTitle() + "/results?plats[3]=1&search_type=advanced";
 			Document document = loadDocument(searchMetaCriticUrl); //Load the url
 			if (document.getElementsByClass("search_results module").isEmpty()) { //if search result is empty add "" into the list
-				System.out.println("Not found in metacritic");
+				System.out.println("Crawling not found in metacritic: " + s.getGameTitle());
 				listOfUrl.add("");
 			} else { //else if search result is not empty
 				Elements searchResult = document.getElementsByClass("search_results module").first().getElementsByClass("product_title basic_stat");
@@ -61,9 +61,11 @@ public class MetaCriticCrawler {
 					} else { //else if game title not equal to steam game title, access the page to check for more info (accuracy of correct games)
 						Document newDoc = loadDocument(specificMetaCriticGameUrl);
 
-						Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer"); //get the developer studio
-						developerStudio = findDeveloper.first().child(1).child(0).text();
-
+						if (newDoc.getElementsByClass("summary_detail developer").first() != null) {
+							Elements findDeveloper = newDoc.getElementsByClass("summary_detail developer"); //get the developer studio
+							developerStudio = findDeveloper.first().child(1).child(0).text();
+						}
+						
 						//if developer studio contains steam developer studio and vice versa, add URL to the list
 						if ((s.getDeveloperStudio().contains(developerStudio)) || (developerStudio.contains(s.getDeveloperStudio()))) {
 							listOfUrl.add(specificMetaCriticGameUrl + "/user-reviews");
@@ -74,6 +76,7 @@ public class MetaCriticCrawler {
 				}
 				//if game is not found add "" to the list
 				if (gameFound == false) {
+					System.out.println("Crawling not found in metacritic: " + s.getGameTitle());
 					listOfUrl.add("");
 				}
 			}
@@ -82,9 +85,9 @@ public class MetaCriticCrawler {
 	}
 
 	/**
-	 * Get the User's review on the game and inserting it into database
+	 * Get the Game Information and inserting it into database
 	 */
-	public void getReview(String url, String gameTitle, MongoDatabase db) throws IOException {
+	public void getGameInfo(String url, String gameTitle, MongoDatabase db) throws IOException {
 		
 		//creating database table, auto create if it doesn't exist
 		MongoCollection<org.bson.Document> reviewCollection = db.getCollection("meta review");

@@ -34,7 +34,7 @@ public class SteamCrawler {
 	 */
 	public static ArrayList<String> getLinks() throws IOException {
 
-		final String url = "https://store.steampowered.com/search/?category1=998&filter=topsellers";
+		final String url = "https://store.steampowered.com/search/?term=-EA+play+-subscription&category1=998&filter=topsellers";
 		Document document = loadDocument(url);
 		Elements gameLinks = document.select("div#search_resultsRows > a");
 		ArrayList<String> links = new ArrayList<>();
