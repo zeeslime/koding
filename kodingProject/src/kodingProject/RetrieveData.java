@@ -1,12 +1,21 @@
+package kodingProject;
+
 import java.util.ArrayList;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-
+/**
+ * This is the RetrieveData Class for retrieving data from database for Steam/MetaCritic
+ * @author Wei Xiang, Chang Hua, Zhan An,Jing Wei
+ */
 public class RetrieveData {
 	
+	/**
+	 * Get the Database Tables for MetaCritic
+	 * @return the listOfMeta Array list in String 
+	 */
 	public static ArrayList<SteamGames> retrieveSteam(MongoDatabase db) {
 
 		//retrieve database table
@@ -56,7 +65,10 @@ public class RetrieveData {
 		}
 		return gameList;
 	}
-
+	/**
+	 * Get the Database Tables for MetaCritic
+	 * @return the listOfMeta Array list in String 
+	 */
 	public static ArrayList<MetaCritic> retrieveMeta(MongoDatabase db, ArrayList<SteamGames> gameList) {
 		
 		//retrieve database table

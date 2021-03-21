@@ -1,3 +1,5 @@
+package kodingProject;
+
 import org.jsoup.Connection;
 import org.jsoup.Connection.Method;
 import org.jsoup.Jsoup;
@@ -56,6 +58,11 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 
+/**
+ * This is the CrawlerProgram class for the main
+ * 
+ * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
+ */
 public class CrawlerProgram {
 	static ArrayList<MetaCritic> mc = new ArrayList<>();
 	static ArrayList<SteamGames> sg = new ArrayList<>();

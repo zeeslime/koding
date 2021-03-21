@@ -1,3 +1,5 @@
+package kodingProject;
+
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -13,6 +15,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 
+/**
+ * This is the DisplayMetaFrame class for UI Display 
+ * 
+ * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
+ */
 public class DisplayMetaFrame {
 
 	JPanel panel = new JPanel();

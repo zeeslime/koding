@@ -1,3 +1,5 @@
+package kodingProject;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -24,6 +26,12 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.border.BevelBorder;
+
+/**
+ * This is the ListPanel class for UI Listings
+ * 
+ * @author Chang Hua, Zhan An, Wei Xiang, Jing Wei
+ */
 
 public class ListPanel extends JPanel
 {
