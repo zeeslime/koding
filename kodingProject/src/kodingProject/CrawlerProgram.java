@@ -27,6 +27,11 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 
+/**
+ * This is a CrawlerProgram Class for Main
+ * @author Zhan An, Wei Xiang, Jing Wei, Chang Hua
+ */
+
 public class CrawlerProgram {
 	static ArrayList<MetaCritic> mc = new ArrayList<>();
 	static ArrayList<SteamGames> sg = new ArrayList<>();
