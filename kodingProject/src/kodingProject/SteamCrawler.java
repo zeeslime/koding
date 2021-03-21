@@ -1,3 +1,5 @@
+package kodingProject;
+
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -14,13 +16,22 @@ import org.jsoup.select.Elements;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class SteamCrawler {
+/**
+ * This is a SteamCrawler Class for crawling "Game Links", "Game Information" & "Loading Document"
+ * @author  Chang Hua, Wei Xiang, Zhan An, Jing Wei
+ */
 
+public class SteamCrawler {
+	/**
+	 * This is a default constructor
+	 */
 	public SteamCrawler() {
 
 	}
-
-	// Get a list of top selling steam games links
+	/**
+	 * Get the Game URL Links
+	 * @return the array list of Game URL Links in string format if found
+	 */
 	public static ArrayList<String> getLinks() throws IOException {
 
 		final String url = "https://store.steampowered.com/search/?category1=998&filter=topsellers";
@@ -34,8 +45,10 @@ public class SteamCrawler {
 
 		return links;
 	}
-	
-	// Get the game information based on the links crawled from top selling steam games
+	/**
+	 * Get the Game Information
+	 * @return the array list of Steam Games User Review URL in string format if found
+	 */
 	public static void getGameInfo(ArrayList<String> listOfGameLinks, MongoDatabase db)
 			throws IOException, HttpStatusException {
 		MongoCollection<org.bson.Document> gameInfoCollection = db.getCollection("game info");
@@ -150,7 +163,10 @@ public class SteamCrawler {
 		}
 	}
 
-	// this method is to load document, if exception caught retry and fetch again
+	/**
+	 * Loads the document
+	 * @return load of the document, if exception caught retry and fetch again
+	 */ 
 	public static Document loadDocument(String url) throws IOException {
 		Document load;
 		// if url caught by an exception, connect and get the url again
