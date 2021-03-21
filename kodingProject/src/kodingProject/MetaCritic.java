@@ -9,7 +9,7 @@ import java.util.List;
  * @author Zhan An, Wei Xiang, Jing Wei, Chang Hua
  */
 
-public class MetaCritic {
+public class MetaCritic extends Game {
 	
 	private double userGameScore;
 	private int positiveReview;
